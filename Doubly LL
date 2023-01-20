@@ -1,0 +1,387 @@
+#include <iostream>
+#include<stack>
+using namespace std;
+
+class node{
+    public:
+    int data;
+    node *prev;
+    node*next;
+    node(int  data){
+        this->data=data;
+        this->prev=NULL;
+        this->next=NULL;
+    }
+};
+void insertathead(node*&head,int data){
+    node*n=new node(data);
+    
+    if(head==NULL){
+        head=n;
+        return;
+    }
+    n->next=head;
+    head->prev=n;
+    
+    head=n;
+    
+}
+void insertatlast(node*&head,int data){
+    node*n=new node(data);
+    if(head==NULL){
+        head=n;
+        return;
+    }
+    node*temp=head;
+    while(temp->next!=NULL){
+        temp=temp->next;
+    }
+    temp->next=n;
+    n->prev=temp;
+}
+int getfirst(node*head){
+    if(head==NULL){
+        return -1;
+    }
+    return head->data;
+}
+int getlast(node*head){
+    if(head==NULL){
+        return -1;
+    }
+    node*temp=head;
+    while(temp->next!=NULL){
+        temp=temp->next;
+    }
+    return temp->data;
+}
+int length(node*head){
+    if(head==NULL){
+        return -1;
+    }
+    int count=0;
+    node*temp=head;
+    while(temp!=NULL){
+        temp=temp->next;
+        count++;
+    }
+    return count;
+}
+
+node* getatindex(node*head,int index){
+    if(head==NULL){
+        return NULL;
+    }
+    else if(index<0||index>length(head)-1){
+        cout<<"invalid index"<<endl;
+        return NULL;
+    }
+    else{
+        node*temp=head;
+        for(int i=0;i<index;i++){
+            temp=temp->next;
+        }
+        return temp;
+    }
+}
+
+void removefirst(node*&head){
+    if(head==NULL){
+        cout<<"empty"<<endl;
+        return;
+    }
+    else if(head->next==NULL){
+       head=NULL;
+      //  head->data=NULL;
+        delete head;
+		cout<<"deleted first element"<<endl;
+        return;
+    }
+    else{
+        node*temp=head;
+      //  head->next->prev=NULL;
+        head=head->next;
+        head->prev=NULL;
+     cout<<"DElete"<<endl;
+        delete temp;
+        
+    }
+    
+}
+
+void removelast(node*&head){
+    if(head==NULL){
+        cout<<"empty"<<endl;
+        return ;
+    }
+    else if(head->next==NULL){
+       removefirst(head);
+       return;
+    }
+    else{
+        node*temp=head;
+        while(temp->next!=NULL){
+            temp=temp->next;
+            
+        }
+       // temp=NULL;
+        temp->prev->next=temp->next;
+        //temp=temp->next;
+        delete temp;
+    }
+}
+void insertatindex(node*&head,int data,int index){
+    node*n=new node(data);
+    if(head==NULL){
+        if(index==0){
+            insertathead(head,data);
+            return;
+        }
+        else {
+            cout<<"invalid index"<<endl;
+            return;
+        }
+    }
+    if(index==length(head)){
+    insertatlast(head,data);
+    return;
+    }
+    if(index<0||index>length(head)){
+        cout<<"Invalid"<<endl;
+        return;
+    }
+    
+    node*temp=head;
+    for(int i=0;i<index;i++){
+        temp=temp->next;
+    }
+    n->prev=temp->prev;
+    temp->prev->next=n;
+    n->next=temp;
+    temp->prev=n;
+}
+void print(node*head){
+    if(head==NULL){
+        return;
+    }
+    node*temp=head;
+    while(temp!=NULL){
+        cout<<temp->data<<" ";
+        temp=temp->next;
+    }
+}
+void removeatindex(node*&head,int index){
+    if(head==NULL){
+            return;
+        }
+     else    if(index<0||index>length(head)-1){
+            cout<<"Invalid"<<endl;
+            return;
+        }
+     else    if(head->next==NULL&&index==0){
+            removefirst(head);
+            return;
+        }
+        else if(index==length(head)-1){
+            removelast(head);
+            return;
+        }
+        else if(index==0){
+           // cout<<"This function"<<endl;
+            node*temp=head;
+           head=head->next;
+           head->prev=NULL;
+           delete temp;
+           return;
+            
+        }
+       else{
+           node*temp=head;
+           for(int i=0;i<index;i++){
+               temp=temp->next;
+           }
+           temp->prev->next=temp->next;
+           temp->next->prev=temp->prev;
+           //temp=NULL;
+           delete temp;
+           
+       } 
+        
+}
+
+
+void insertbefore(node*&head,int index,int data){
+    if(head==NULL){
+        cout<<"empty list"<<endl;
+        return;
+    }
+    node*refnode=getatindex(head,index);
+    
+    node*n=new node(data);
+    if(refnode->prev==NULL){
+        insertathead(head,data);
+        return;
+    }
+    //if(index-1==0){
+      //  insertathead(head,data);
+        //return;
+    //}
+    n->next=refnode;
+    refnode->prev->next=n;
+    n->prev=refnode->prev;
+    refnode->prev=n;
+    
+}
+void insertafter(node*&head,int index,int data){
+     if(head==NULL){
+        cout<<"empty list"<<endl;
+        return;
+    }
+    node*prevnode=getatindex(head,index);
+    node*n=new node(data);
+    if(prevnode->next==NULL){
+        insertatlast(head,data);
+        return;
+    }
+    n->next=prevnode->next;
+    prevnode->next->prev=n;
+    prevnode->next=n;
+    
+    n->prev=prevnode;
+}
+void removeafter(node*&head,int index){
+    if(head==NULL){
+        cout<<"empty list"<<endl;
+        return;
+    }
+    node*refnode=getatindex(head,index);
+    if(refnode->next==NULL){
+        cout<<"ELement does not exist"<<endl;
+        
+    }
+    node*fwdnode=refnode->next;
+    if(fwdnode->next==NULL){
+        removelast(head);
+        return;
+    }
+	
+    refnode->next=fwdnode->next;
+    fwdnode->next->prev=refnode;
+    
+}
+void removebefore(node*&head,int index){
+    if(head==NULL){
+        cout<<"empty list"<<endl;
+        return;
+    }
+    node*refnode=getatindex(head,index);
+    if(refnode->prev==NULL){
+        cout<<"element does not exist"<<endl;
+    }
+	
+    node*prevnode=refnode->prev;
+	if(prevnode->prev==NULL){
+		removefirst(head);
+		return;
+	}
+    refnode->prev=prevnode->prev;
+    prevnode->prev->next=refnode;
+    
+}
+void removeatnode(node*&head,int index){
+	if(head==NULL){
+		cout<<"Epmty"<<endl;
+		return;
+	}
+	node*refnode=getatindex(head,index);
+//	node*fwdnode=refnode->next;
+//	node*prevnode=refnode->prev;
+	//last
+	if(refnode->next==NULL){
+		removelast(head);
+		return;
+	}
+	//first
+	if(refnode->prev==NULL){
+		removefirst(head);
+		return;
+	}
+	//only 1 element
+	if(refnode->next&&refnode->prev==NULL){
+		head=NULL;
+		delete head;
+		cout<<"element deleted"<<endl;
+		return;
+	}
+	//only 2 elemt 
+	if(refnode->next->next==NULL){
+		
+		refnode->next->prev=NULL;
+		refnode->next=NULL;
+		return;
+	}
+	refnode->next->prev=refnode->prev;
+	refnode->prev->next=refnode->next;
+
+//	prevnode->next=refnode->next;
+  //  fwdnode->prev=refnode->prev;
+	refnode->next=NULL;
+	refnode->prev=NULL;
+}
+void printforward(node*head){
+	node*temp=NULL;
+	while(temp!=NULL){
+		cout<<temp->data<<" ";
+		temp=temp->next;
+		
+	}
+}
+/*void printbackward(node*head){
+	node*temp=NULL;
+	node*prevnode=NULL;
+	while(temp!=NULL){
+		prevnode->prev=temp;
+		temp=temp->next;
+	}
+	while(prevnode->prev!=NULL){
+		cout<<prevnode->data<<" ";
+		prevnode=prevnode->next;
+	}
+}*/
+	
+	void printbackward(node*head){
+		stack<int>backward;
+	 node*temp=head;
+	 while(temp!=NULL){
+		 backward.push(temp->data);
+		 temp=temp->next;
+	 }
+	 while(!backward.empty()){
+		 int back=backward.top();
+		 cout<<backward.top()<<" ";
+		 backward.pop();
+	 }
+	}
+	int main(){
+    node*head=new node(10);
+//insertatindex(head,20,1);
+  //insertatindex(head,30,2);
+  //insertatindex(head,40,3);
+ //node*prev=new node(20);
+ // print(head);
+ //insertatindex(head,);
+ //insertafter(head,3,50);
+ //node*ans=getatindex(head,1);
+ //cout<<ans->data<<endl;
+   //insertatlast(head,20);
+  //print(head);
+  removelast(head);
+  print(head);
+  //removeatindex(head,6);
+ // cout<<"remve first"<<endl;
+  //print(head);
+ //removeatnode(head,1);
+ //out<<"remve after"<<endl;
+// print(head);
+// printbackward(head);
+}
